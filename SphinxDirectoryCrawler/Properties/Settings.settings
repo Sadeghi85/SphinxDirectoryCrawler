@@ -1,0 +1,36 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SphinxDirectoryCrawler.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="mysql_host" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+    <Setting Name="mysql_user" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">root</Value>
+    </Setting>
+    <Setting Name="mysql_password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">windows</Value>
+    </Setting>
+    <Setting Name="mysql_db" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">sphinx_lib_eshia_ir</Value>
+    </Setting>
+    <Setting Name="mysql_table" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">documents</Value>
+    </Setting>
+    <Setting Name="mysql_temp_table" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">documents_tmp</Value>
+    </Setting>
+    <Setting Name="mysql_deleted_table" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">documents_deleted</Value>
+    </Setting>
+    <Setting Name="root_directory" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\inetpub\Books\Shia</Value>
+    </Setting>
+    <Setting Name="wildcard_pattern" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">*.html</Value>
+    </Setting>
+    <Setting Name="regex_pattern" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">(?'bookid'\d{5})\\(?'volume'\d{2,3})\\(?'page'\d{3,4})\.html$</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
