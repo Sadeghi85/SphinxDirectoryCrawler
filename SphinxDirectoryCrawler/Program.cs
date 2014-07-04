@@ -228,7 +228,7 @@ namespace SphinxDirectoryCrawler
                 _query = sprintf(_query, Properties.Settings.Default.mysql_temp_table, Id, file.FullName.ToLower().Replace("\\", "\\\\"), ToUnixTimestamp(file.LastWriteTimeUtc));
                 foreach (KeyValuePair<string, string> match in matches)
                 {
-                    _query += ", '" + match.Value + "'";
+                    _query += ", " + match.Value;
                 }
                 _query += ");";
 
