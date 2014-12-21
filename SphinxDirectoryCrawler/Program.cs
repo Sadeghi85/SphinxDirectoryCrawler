@@ -182,7 +182,7 @@ namespace SphinxDirectoryCrawler
             catch (Exception e)
             {
                 Console.WriteLine(sprintf("Exception of type: '%s' with massage: '%s'.", e.GetType(), e.Message));
-                Console.ReadLine();
+                //Console.ReadLine();
                 return;
             }
 
@@ -333,7 +333,7 @@ namespace SphinxDirectoryCrawler
             sw.Stop(); //stop
             Console.WriteLine("" + sw.ElapsedMilliseconds + "ms"); //display the duration
 
-            Console.ReadLine();
+            //Console.ReadLine();
         }
     }
 }
