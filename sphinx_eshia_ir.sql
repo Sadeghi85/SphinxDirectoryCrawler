@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.11 (64 bit)
-MySQL - 5.6.11 : Database - sphinx_lib_eshia_ir
+MySQL - 5.6.11 : Database - sphinx_eshia_ir
 *********************************************************************
 */
 
@@ -21,9 +21,10 @@ CREATE TABLE `documents` (
   `id` bigint(20) unsigned NOT NULL,
   `path` varchar(255) NOT NULL,
   `modified_at` int(10) unsigned NOT NULL,
-  `bookid` bigint(20) unsigned NOT NULL,
-  `volume` bigint(20) unsigned NOT NULL,
-  `page` bigint(20) unsigned NOT NULL,
+  `teacher` bigint(20) unsigned NOT NULL,
+  `lesson` bigint(20) unsigned NOT NULL,
+  `term` bigint(20) unsigned NOT NULL,
+  `day` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`auto_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

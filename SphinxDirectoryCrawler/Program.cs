@@ -224,13 +224,17 @@ namespace SphinxDirectoryCrawler
                 {
                     _query += ", `" + match.Key + "`";
                 }
-                _query += ") VALUES (%s,'%s', %s";
+                //_query += ") VALUES (%s,'%s', %s";
+                _query += ") SELECT %s,'%s', %s";
+
                 _query = sprintf(_query, Properties.Settings.Default.mysql_temp_table, Id, file.FullName.ToLower().Replace("\\", "\\\\"), ToUnixTimestamp(file.LastWriteTimeUtc));
                 foreach (KeyValuePair<string, string> match in matches)
                 {
-                    _query += ", " + match.Value;
+                    //_query += ", " + match.Value;
+                    _query += ", (SELECT CONV(SUBSTR(h, 1, 8), 16, 10) << 32 | CONV(SUBSTR(h, 9, 8), 16, 10) AS h FROM (SELECT SHA2('" + match.Value + "', 512) AS h) AS t)";
                 }
-                _query += ");";
+                //_query += ");";
+                _query += ";";
 
 
                 myCommand.CommandText = _query;
