@@ -25,7 +25,8 @@ CREATE TABLE `documents` (
   `lesson` bigint(20) unsigned NOT NULL,
   `term` bigint(20) unsigned NOT NULL,
   `day` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`auto_id`)
+  PRIMARY KEY (`auto_id`),
+  KEY `index_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `documents_deleted` */

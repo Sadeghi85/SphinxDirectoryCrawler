@@ -24,7 +24,8 @@ CREATE TABLE `documents` (
   `bookid` bigint(20) unsigned NOT NULL,
   `volume` bigint(20) unsigned NOT NULL,
   `page` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`auto_id`)
+  PRIMARY KEY (`auto_id`),
+  KEY `index_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `documents_deleted` */
