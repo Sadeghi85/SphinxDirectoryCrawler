@@ -229,17 +229,29 @@ namespace SphinxDirectoryCrawler
                 //_query += ") SELECT %s,'%s', %s";
 
                 _query = sprintf(_query, Properties.Settings.Default.mysql_temp_table, Id, file.FullName.ToLower().Replace("\\", "\\\\"), ToUnixTimestamp(file.LastWriteTimeUtc));
+
+
                 foreach (KeyValuePair<string, string> match in matches)
                 {
                     //_query += ", " + match.Value;
 
                     byte[] hash;
-                    using (SHA512 shaM = new SHA512Managed())
-                    {
-                        hash = shaM.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
-                    }
+                    //CRC32 crc32 = new CRC32();
+                    //hash = crc32.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
 
-                    _query += ", " + (UInt64.Parse(BitConverter.ToString(hash, 0, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber) << 32 | UInt64.Parse(BitConverter.ToString(hash, 4, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber));
+                    using (CRC32 crc32 = new CRC32())
+                    {
+                        hash = crc32.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
+                    }
+                    
+                    //using (SHA512 shaM = new SHA512Managed())
+                    //{
+                    //    hash = shaM.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
+                    //}
+
+                    _query += ", " + UInt64.Parse(BitConverter.ToString(hash).Replace("-", ""), System.Globalization.NumberStyles.HexNumber);
+
+                    //_query += ", " + (UInt64.Parse(BitConverter.ToString(hash, 0, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber) << 32 | UInt64.Parse(BitConverter.ToString(hash, 4, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber));
 
                     //_query += ", (SELECT CONV(SUBSTR(h, 1, 8), 16, 10) << 32 | CONV(SUBSTR(h, 9, 8), 16, 10) AS h FROM (SELECT SHA2('" + match.Value + "', 512) AS h) AS t)";
                 }
