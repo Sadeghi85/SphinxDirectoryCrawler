@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using BrandonHaynes.Security.SipHash;
 using System.Threading;
 using System.Security.Cryptography;
+using DamienG.Security.Cryptography;
 
 namespace SphinxDirectoryCrawler
 {
@@ -223,7 +224,7 @@ namespace SphinxDirectoryCrawler
                 _query = "INSERT INTO `%s` (`id`, `path`, `modified_at`";
                 foreach (KeyValuePair<string, string> match in matches)
                 {
-                    _query += ", `" + match.Key + "`";
+                    _query += ", `" + match.Key + "`, `" + match.Key + "_hash`";
                 }
                 _query += ") VALUES (%s,'%s', %s";
                 //_query += ") SELECT %s,'%s', %s";
@@ -239,7 +240,7 @@ namespace SphinxDirectoryCrawler
                     //CRC32 crc32 = new CRC32();
                     //hash = crc32.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
 
-                    using (CRC32 crc32 = new CRC32())
+                    using (Crc32 crc32 = new Crc32())
                     {
                         hash = crc32.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
                     }
@@ -249,7 +250,7 @@ namespace SphinxDirectoryCrawler
                     //    hash = shaM.ComputeHash(Encoding.UTF8.GetBytes(match.Value));
                     //}
 
-                    _query += ", " + UInt64.Parse(BitConverter.ToString(hash).Replace("-", ""), System.Globalization.NumberStyles.HexNumber);
+                    _query += ", '" + match.Value + "', " + UInt64.Parse(BitConverter.ToString(hash).Replace("-", ""), System.Globalization.NumberStyles.HexNumber);
 
                     //_query += ", " + (UInt64.Parse(BitConverter.ToString(hash, 0, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber) << 32 | UInt64.Parse(BitConverter.ToString(hash, 4, 4).Replace("-", ""), System.Globalization.NumberStyles.HexNumber));
 

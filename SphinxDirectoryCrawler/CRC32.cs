@@ -1,164 +1,98 @@
-// Tamir Khason http://khason.net/
-//
-// Released under MS-PL : 6-Apr-09
-
+// Copyright (c) Damien Guard. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+// Originally published at http://damieng.com/blog/2006/08/08/calculating_crc32_in_c_and_net
 using System;
-using System.Collections;
-using System.IO;
+using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
-
-   /// <summary>Implements a 32-bits cyclic redundancy check (CRC) hash algorithm.</summary>
-   /// <remarks>This class is not intended to be used for security purposes. For security applications use MD5, SHA1, SHA256, SHA384, 
-   /// or SHA512 in the System.Security.Cryptography namespace.</remarks>
-   public class CRC32 : HashAlgorithm {
-
-      #region CONSTRUCTORS
-      /// <summary>Creates a CRC32 object using the <see cref="DefaultPolynomial"/>.</summary>
-      public CRC32() : this(DefaultPolynomial) {
-      }
-
-      /// <summary>Creates a CRC32 object using the specified polynomial.</summary>
-      /// <remarks>The polynomical should be supplied in its bit-reflected form. <see cref="DefaultPolynomial"/>.</remarks>
-      //[CLSCompliant(false)]
-      public CRC32(uint polynomial) {
-         HashSizeValue = 32;
-         _crc32Table = (uint[])_crc32TablesCache[polynomial];
-         if (_crc32Table == null) {
-            _crc32Table = CRC32._buildCRC32Table(polynomial);
-            _crc32TablesCache.Add(polynomial, _crc32Table);
-         }
-         Initialize();
-      }
-
-      // static constructor
-      static CRC32() {
-         _crc32TablesCache = Hashtable.Synchronized(new Hashtable());
-         _defaultCRC = new CRC32();
-      }
-      #endregion
-
-      #region PROPERTIES
-      /// <summary>Gets the default polynomial (used in WinZip, Ethernet, etc.)</summary>
-      /// <remarks>The default polynomial is a bit-reflected version of the standard polynomial 0x04C11DB7 used by WinZip, Ethernet, etc.</remarks>
-      //[CLSCompliant(false)]
-      public static readonly uint DefaultPolynomial = 0xEDB88320; // Bitwise reflection of 0x04C11DB7;
-      #endregion
-
-      #region METHODS
-      /// <summary>Initializes an implementation of HashAlgorithm.</summary>
-      public override void Initialize() {
-         _crc = _allOnes;
-      }
-
-      /// <summary>Routes data written to the object into the hash algorithm for computing the hash.</summary>
-      protected override void HashCore(byte[] buffer, int offset, int count) {
-         for (int i = offset; i < count; i++) {
-            ulong ptr = (_crc & 0xFF) ^ buffer[i];
-            _crc >>= 8;
-            _crc ^= _crc32Table[ptr];
-         }
-      }
-
-      /// <summary>Finalizes the hash computation after the last data is processed by the cryptographic stream object.</summary>
-      protected override byte[] HashFinal() {
-         byte[] finalHash = new byte[4];
-         ulong finalCRC = _crc ^ _allOnes;
-
-         finalHash[0] = (byte)((finalCRC >> 0) & 0xFF);
-         finalHash[1] = (byte)((finalCRC >> 8) & 0xFF);
-         finalHash[2] = (byte)((finalCRC >> 16) & 0xFF);
-         finalHash[3] = (byte)((finalCRC >> 24) & 0xFF);
-
-         return finalHash;
-      }
-
-      /// <summary>Computes the CRC32 value for the given ASCII string using the <see cref="DefaultPolynomial"/>.</summary>
-      public static int Compute(string asciiString) {
-         _defaultCRC.Initialize();
-         return ToInt32(_defaultCRC.ComputeHash(asciiString));
-      }
-
-      /// <summary>Computes the CRC32 value for the given input stream using the <see cref="DefaultPolynomial"/>.</summary>
-      public static int Compute(Stream inputStream) {
-         _defaultCRC.Initialize();
-         return ToInt32(_defaultCRC.ComputeHash(inputStream));
-      }
-
-      /// <summary>Computes the CRC32 value for the input data using the <see cref="DefaultPolynomial"/>.</summary>
-      public static int Compute(byte[] buffer) {
-         _defaultCRC.Initialize();
-         return ToInt32(_defaultCRC.ComputeHash(buffer));
-      }
-
-      /// <summary>Computes the hash value for the input data using the <see cref="DefaultPolynomial"/>.</summary>
-      public static int Compute(byte[] buffer, int offset, int count) {
-         _defaultCRC.Initialize();
-         return ToInt32(_defaultCRC.ComputeHash(buffer, offset, count));
-      }
-
-      /// <summary>Computes the hash value for the given ASCII string.</summary>
-      /// <remarks>The computation preserves the internal state between the calls, so it can be used for computation of a stream data.</remarks>
-      public byte[] ComputeHash(string asciiString) {
-         byte[] rawBytes = ASCIIEncoding.ASCII.GetBytes(asciiString);
-         return ComputeHash(rawBytes);
-      }
-
-      /// <summary>Computes the hash value for the given input stream.</summary>
-      /// <remarks>The computation preserves the internal state between the calls, so it can be used for computation of a stream data.</remarks>
-      new public byte[] ComputeHash(Stream inputStream) {
-         byte[] buffer = new byte[4096];
-         int bytesRead;
-         while ((bytesRead = inputStream.Read(buffer, 0, 4096)) > 0) {
-            HashCore(buffer, 0, bytesRead);
-         }
-         return HashFinal();
-      }
-
-      /// <summary>Computes the hash value for the input data.</summary>
-      /// <remarks>The computation preserves the internal state between the calls, so it can be used for computation of a stream data.</remarks>
-      new public byte[] ComputeHash(byte[] buffer) {
-         return ComputeHash(buffer, 0, buffer.Length);
-      }
-
-      /// <summary>Computes the hash value for the input data.</summary>
-      /// <remarks>The computation preserves the internal state between the calls, so it can be used for computation of a stream data.</remarks>
-      new public byte[] ComputeHash(byte[] buffer, int offset, int count) {
-         HashCore(buffer, offset, count);
-         return HashFinal();
-      }
-      #endregion
-
-      #region PRIVATE SECTION
-      private static uint _allOnes = 0xffffffff;
-      private static CRC32 _defaultCRC;
-      private static Hashtable _crc32TablesCache;
-      private uint[] _crc32Table;
-      private uint _crc;
-
-      // Builds a crc32 table given a polynomial
-      private static uint[] _buildCRC32Table(uint polynomial) {
-         uint crc;
-         uint[] table = new uint[256];
-
-         // 256 values representing ASCII character codes. 
-         for (int i = 0; i < 256; i++) {
-            crc = (uint)i;
-            for (int j = 8; j > 0; j--) {
-               if ((crc & 1) == 1)
-                  crc = (crc >> 1) ^ polynomial;
-               else
-                  crc >>= 1;
+namespace DamienG.Security.Cryptography
+{
+    /// <summary>
+    /// Implements a 32-bit CRC hash algorithm compatible with Zip etc.
+    /// </summary>
+    /// <remarks>
+    /// Crc32 should only be used for backward compatibility with older file formats
+    /// and algorithms. It is not secure enough for new applications.
+    /// If you need to call multiple times for the same data either use the HashAlgorithm
+    /// interface or remember that the result of one Compute call needs to be ~ (XOR) before
+    /// being passed in as the seed for the next Compute call.
+    /// </remarks>
+    public sealed class Crc32 : HashAlgorithm
+    {
+        public const UInt32 DefaultPolynomial = 0xedb88320u;
+        public const UInt32 DefaultSeed = 0xffffffffu;
+        private static UInt32[] defaultTable;
+        private readonly UInt32 seed;
+        private readonly UInt32[] table;
+        private UInt32 hash;
+        public Crc32()
+            : this(DefaultPolynomial, DefaultSeed)
+        {
+        }
+        public Crc32(UInt32 polynomial, UInt32 seed)
+        {
+            table = InitializeTable(polynomial);
+            this.seed = hash = seed;
+        }
+        public override void Initialize()
+        {
+            hash = seed;
+        }
+        protected override void HashCore(byte[] buffer, int start, int length)
+        {
+            hash = CalculateHash(table, hash, buffer, start, length);
+        }
+        protected override byte[] HashFinal()
+        {
+            var hashBuffer = UInt32ToBigEndianBytes(~hash);
+            HashValue = hashBuffer;
+            return hashBuffer;
+        }
+        public override int HashSize { get { return 32; } }
+        public static UInt32 Compute(byte[] buffer)
+        {
+            return Compute(DefaultSeed, buffer);
+        }
+        public static UInt32 Compute(UInt32 seed, byte[] buffer)
+        {
+            return Compute(DefaultPolynomial, seed, buffer);
+        }
+        public static UInt32 Compute(UInt32 polynomial, UInt32 seed, byte[] buffer)
+        {
+            return ~CalculateHash(InitializeTable(polynomial), seed, buffer, 0, buffer.Length);
+        }
+        private static UInt32[] InitializeTable(UInt32 polynomial)
+        {
+            if (polynomial == DefaultPolynomial && defaultTable != null)
+                return defaultTable;
+            var createTable = new UInt32[256];
+            for (var i = 0; i < 256; i++)
+            {
+                var entry = (UInt32)i;
+                for (var j = 0; j < 8; j++)
+                    if ((entry & 1) == 1)
+                        entry = (entry >> 1) ^ polynomial;
+                    else
+                        entry = entry >> 1;
+                createTable[i] = entry;
             }
-            table[i] = crc;
-         }
-
-         return table;
-      }
-
-      private static int ToInt32(byte[] buffer) {
-         return BitConverter.ToInt32(buffer, 0);
-      }
-      #endregion
-
-   }
+            if (polynomial == DefaultPolynomial)
+                defaultTable = createTable;
+            return createTable;
+        }
+        private static UInt32 CalculateHash(UInt32[] table, UInt32 seed, IList<byte> buffer, int start, int size)
+        {
+            var crc = seed;
+            for (var i = start; i < size - start; i++)
+                crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
+            return crc;
+        }
+        private static byte[] UInt32ToBigEndianBytes(UInt32 uint32)
+        {
+            var result = BitConverter.GetBytes(uint32);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(result);
+            return result;
+        }
+    }
+}
