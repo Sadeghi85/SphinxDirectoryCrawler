@@ -21,10 +21,14 @@ CREATE TABLE `documents` (
   `id` bigint(20) unsigned NOT NULL,
   `path` varchar(255) NOT NULL,
   `modified_at` int(10) unsigned NOT NULL,
-  `teacher` bigint(20) unsigned NOT NULL,
-  `lesson` bigint(20) unsigned NOT NULL,
-  `term` bigint(20) unsigned NOT NULL,
-  `day` bigint(20) unsigned NOT NULL,
+  `teacher` varchar(50) NOT NULL,
+  `teacher_hash` bigint(20) unsigned NOT NULL,
+  `lesson` varchar(50) NOT NULL,
+  `lesson_hash` bigint(20) unsigned NOT NULL,
+  `term` varchar(50) NOT NULL,
+  `term_hash` bigint(20) unsigned NOT NULL,
+  `day` varchar(50) NOT NULL,
+  `day_hash` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`auto_id`),
   KEY `index_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
