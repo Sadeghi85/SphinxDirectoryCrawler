@@ -16,6 +16,7 @@ namespace SphinxDirectoryCrawler
     class Program
     {
         private static readonly Regex re = new Regex("^" + Regex.Escape(Properties.Settings.Default.root_directory) + "\\\\" + Properties.Settings.Default.regex_pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex xe = new Regex("\\\\" + Properties.Settings.Default.exclude_pattern + "\\\\", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public static string sprintf(string input, params object[] inpVars)
         {
@@ -171,7 +172,7 @@ namespace SphinxDirectoryCrawler
             DirectoryInfo dirInfo = new DirectoryInfo(Properties.Settings.Default.root_directory);
             var files = from f in 
                         dirInfo.EnumerateFiles(Properties.Settings.Default.wildcard_pattern, SearchOption.AllDirectories).Where(file =>
-                               re.IsMatch(file.FullName))
+                               re.IsMatch(file.FullName)).Where(file => ! xe.IsMatch(file.FullName))
                         select f;
 
 
