@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.11 (64 bit)
-MySQL - 5.6.11 : Database - sphinx_eshia_ir
+MySQL - 5.6.11 : Database - sphinx_fa_wikifeqh_ir
 *********************************************************************
 */
 
@@ -21,14 +21,8 @@ CREATE TABLE `documents` (
   `id` bigint(20) unsigned NOT NULL,
   `path` varchar(255) NOT NULL,
   `modified_at` int(10) unsigned NOT NULL,
-  `teacher` varchar(50) NOT NULL,
-  `teacher_hash` bigint(20) unsigned NOT NULL,
-  `lesson` varchar(50) NOT NULL,
-  `lesson_hash` bigint(20) unsigned NOT NULL,
-  `year` varchar(50) NOT NULL,
-  `year_hash` bigint(20) unsigned NOT NULL,
-  `date` varchar(50) NOT NULL,
-  `date_hash` bigint(20) unsigned NOT NULL,
+  `topicid` varchar(50) NOT NULL,
+  `topicid_hash` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`auto_id`),
   KEY `index_id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
